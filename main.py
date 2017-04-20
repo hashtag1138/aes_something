@@ -51,9 +51,9 @@ if __name__ == "__main__":
 		pass
 	elif Cli().isset('--list'):			# Liste les fichier du volume
 		pass
-	elif Cli().isset('--update-psswd'):	# Change le mot de passe
+	elif Cli().isset('--update-psswd'):		# Change le mot de passe
 		pass							
 	elif Cli().isset('--help'):			# Affiche l'aide
 		printHelp()
-	else:								# Affiche l'aide
+	else:						# Affiche l'aide
 		printHelp()
