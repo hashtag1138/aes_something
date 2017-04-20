@@ -2,7 +2,7 @@ from Crypto import Random
 from Crypto.Hash import SHA512
 from Crypto.Cipher import AES
 from Crypto.Protocol import KDF
-from constants import Constant as const
+from constants import ConstantSize as size
 def rndIv():
 	return Random.new().read(AES.block_size)
 	#Return bytes()
@@ -27,18 +27,12 @@ def addHash(txt):
 	return getHash(txt) + txt
 
 def removeHash(txt):
-	hs = const().HASH_SIZE
+	hs = size().HASH
 	hash_given = txt[:hs]
 	return txt[hs:] if hash_given == getHash(txt[hs:]) else False
 
-def enlarge384(meta):
-	ms = const().HEADER_SIZE
-	hs = const().HASH_SIZE
-	padding = "".join([chr(0)] * ms - hs - len(meta) - 2).encode()
-	return chr(len(padding)).encode() + meta + padding
-
 def enlarge255(filename):
-	fns = const().FILENAME_SIZE
+	fns = size().FILENAME
 	padding = "".join([chr(0)] * (fns - len(filename) - 1)).encode()
 	return chr(len(filename)).encode() + filename.encode() + padding
 
@@ -49,21 +43,21 @@ def aesDecrypt(iv, key, xtx):
 	return removeHash(AES.new(key, AES.MODE_CFB, iv).decrypt(xtx))
 	
 def packMeta(filename, iv, key, start_f, end_f):
-	start_f = ('%0*x'%(19,start_f)).encode()
-	end_f = ('%0*x'%(19,end_f)).encode()
+	start_f = ('%0*x'%(17,start_f)).encode()
+	end_f = ('%0*x'%(17,end_f)).encode()
 	filename = enlarge255(filename)
 	return filename + iv + key + start_f + end_f
 
 def depackMeta(meta):
-	f_len = Constant().FILENAME_SIZE
-	iv_len = Constant().IV_SIZE
-	key_len = Constant().AESKEY_SIZE
-	s_offset_len = Constant().FILE_START_OFFSET_SIZE
-	e_offset_len = Constant().FILE_END_OFFSET_SIZE
-	filename = deflateFilename(meta[:f_len])
-	iv = meta[f_len : iv_len]
-	key = meta[f_len + iv_len : key_len]
-	start_f = meta[f_len + iv_len + key_len: s_offset_len ]
-	end_f = meta[f_len + iv_len + key_len + s_offset_len: ]
-	return (deflateFilename(filename), iv, key, start_f, end_f)
-
+	iv_s = size().IV
+	k_s = size().AESKEY
+	fn_s = size().FILENAME
+	s_s = size().FILE_START_OFFSET
+	e_s = size().FILE_END_OFFSET
+	filenamelen = meta[0]
+	filename = meta[1:meta[0] + 1 ]
+	iv = meta[fn_s: fn_s + iv_s ]
+	key = meta[fn_s + iv_s : fn_s + iv_s + k_s ]
+	start_f = meta[fn_s + iv_s + k_s: fn_s + iv_s + k_s + s_s]
+	end_f = meta[ fn_s + iv_s + k_s + s_s:  fn_s + iv_s + k_s + s_s + e_s]
+	return  (filename, iv, key, start_f , end_f)

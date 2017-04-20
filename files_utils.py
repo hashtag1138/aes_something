@@ -10,7 +10,7 @@ def writeFile_b64(outfilename, txt):
 		return True
 	return False
 
-def getAllHeaders(filename):
+def readHeadBlock(filename):
 	with open(filename, 'rb'):
 		headers = [] * Constant().HEADER_NUMBER
 		for i in range(len(headers) -1):

@@ -26,10 +26,11 @@ if __name__ == "__main__":
 	print('aesEncrypt(iv, key, txt): %s: %s\n'%(xtx, len(xtx)))
 	txt = aesDecrypt(ivf, keyf, xtx)
 	print('aesDecrypt(iv, key, xtx): %s: %s\n'%(txt, len(txt)))
-	filename = 'test.txt'
+	filename = 'salutlescopain.txt'
 	start_f = 0
 	end_f = 2**64
-	
+	print('(filename, ivf, keyf, start_f, end_f): %s: %s\n'%((filename, ivf, keyf, ('%0*x'%(17,start_f)), ('%0*x'%(17,end_f))),
+															len("".join((filename, str(ivf), str(keyf), '%0*x'%(17,start_f), '%0*x'%(17,end_f))))))
 	meta = packMeta(filename, ivf, keyf, start_f, end_f)
 	print('packMeta(filename, iv, key, start_f, end_f): %s: %s\n'%(meta, len(meta)))
 	print('len: filename = meta[0] : %s'%int(meta[0]))
@@ -45,4 +46,6 @@ if __name__ == "__main__":
 	print('aesEncrypt(iv, key, meta): %s: %s\n'%(atem, len(atem)))
 	meta = aesDecrypt(ivm, keym, atem)
 	print('aesDecrypt(iv, key, atem): %s: %s\n'%(meta, len(meta)))
+	meta = depackMeta(meta)
+	print('depackMeta(meta): %s: %s'%(meta, len("".join(str(meta)))))
 	print('------------------------------------')
